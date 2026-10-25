@@ -1,6 +1,8 @@
 # proycto_1
 
-A new Flutter project.
+Wiki del videojuego Campus Quest, en Flutter.
+
+Las herramientas del proyecto y para qué sirve cada una están en [docs/herramientas.md](docs/herramientas.md). El sistema visual está en [docs/diseño.md](docs/diseño.md).
 
 ## Getting Started
 
