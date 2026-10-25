@@ -19,20 +19,20 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
 
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
-  String? _usernameError;
+  String? _emailError;
   String? _passwordError;
   String? _confirmError;
   bool _submitting = false;
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     _confirmController.dispose();
     super.dispose();
@@ -40,18 +40,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _submit() async {
     setState(() {
-      _usernameError = null;
+      _emailError = null;
       _passwordError = null;
       _confirmError = null;
     });
 
-    final username = _usernameController.text;
+    final email = _emailController.text;
     final password = _passwordController.text;
     final confirm = _confirmController.text;
 
     var hasError = false;
-    if (username.trim().isEmpty) {
-      _usernameError = 'Ingresa un usuario.';
+    if (email.trim().isEmpty) {
+      _emailError = 'Ingresa tu correo.';
+      hasError = true;
+    } else if (!email.trim().contains('@')) {
+      _emailError = 'Ingresa un correo válido.';
       hasError = true;
     }
     if (password.isEmpty) {
@@ -73,7 +76,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _submitting = true);
 
     final registerError = await widget.authRepository.register(
-      username,
+      email,
       password,
     );
 
@@ -84,33 +87,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (registerError != null) {
       setState(() {
         _submitting = false;
-        _usernameError = registerError;
+        _emailError = registerError;
       });
       return;
     }
 
-    final loginError = await widget.authRepository.login(
-      username,
-      password,
-      remember: false,
-    );
-
-    if (!mounted) {
-      return;
-    }
-
-    if (loginError != null) {
-      setState(() {
-        _submitting = false;
-        _passwordError = loginError;
-      });
-      return;
-    }
+    final sessionEmail =
+        widget.authRepository.currentSession() ?? email.trim();
 
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute<void>(
         builder: (_) => HomeScreen(
-          username: username.trim(),
+          username: sessionEmail,
           authRepository: widget.authRepository,
         ),
       ),
@@ -142,16 +130,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Text('Crea tu cuenta', style: AppTypography.loginTitle),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
-                    'Elige un usuario y una contraseña para entrar al archivo.',
+                    'Elige un correo y una contraseña para entrar al archivo.',
                     style: AppTypography.body,
                   ),
                   const SizedBox(height: AppSpacing.xl),
                   AppTextField(
-                    label: 'Usuario',
-                    hint: 'tu_usuario',
-                    icon: Icons.person_outline,
-                    controller: _usernameController,
-                    errorText: _usernameError,
+                    label: 'Correo',
+                    hint: 'tu@correo.com',
+                    icon: Icons.email_outlined,
+                    controller: _emailController,
+                    errorText: _emailError,
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   AppTextField(

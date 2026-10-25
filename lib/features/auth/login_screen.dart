@@ -7,6 +7,7 @@ import '../../core/widgets/app_text_field.dart';
 import '../../core/widgets/primary_button.dart';
 import '../home/home_screen.dart';
 import 'auth_repository.dart';
+import 'recover_screen.dart';
 import 'register_screen.dart';
 import 'widgets/auth_header.dart';
 
@@ -20,18 +21,17 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  bool _rememberMe = false;
   bool _obscurePassword = true;
-  String? _usernameError;
+  String? _emailError;
   String? _passwordError;
   bool _submitting = false;
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -44,18 +44,29 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  void _openRecover() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => RecoverScreen(authRepository: widget.authRepository),
+      ),
+    );
+  }
+
   Future<void> _submit() async {
     setState(() {
-      _usernameError = null;
+      _emailError = null;
       _passwordError = null;
     });
 
-    final username = _usernameController.text;
+    final email = _emailController.text;
     final password = _passwordController.text;
 
     var hasError = false;
-    if (username.trim().isEmpty) {
-      _usernameError = 'Ingresa tu usuario.';
+    if (email.trim().isEmpty) {
+      _emailError = 'Ingresa tu correo.';
+      hasError = true;
+    } else if (!email.trim().contains('@')) {
+      _emailError = 'Ingresa un correo válido.';
       hasError = true;
     }
     if (password.isEmpty) {
@@ -69,11 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _submitting = true);
 
-    final error = await widget.authRepository.login(
-      username,
-      password,
-      remember: _rememberMe,
-    );
+    final error = await widget.authRepository.login(email, password);
 
     if (!mounted) {
       return;
@@ -87,13 +94,13 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    final key = username.trim();
-    final sessionUser = widget.authRepository.currentSession() ?? key;
+    final sessionEmail =
+        widget.authRepository.currentSession() ?? email.trim();
 
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute<void>(
         builder: (_) => HomeScreen(
-          username: sessionUser,
+          username: sessionEmail,
           authRepository: widget.authRepository,
         ),
       ),
@@ -130,11 +137,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: AppSpacing.xl),
                   AppTextField(
-                    label: 'Usuario',
-                    hint: 'tu_usuario',
-                    icon: Icons.person_outline,
-                    controller: _usernameController,
-                    errorText: _usernameError,
+                    label: 'Correo',
+                    hint: 'tu@correo.com',
+                    icon: Icons.email_outlined,
+                    controller: _emailController,
+                    errorText: _emailError,
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   AppTextField(
@@ -160,25 +167,23 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: AppSpacing.md),
                   Row(
                     children: [
-                      SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: Checkbox(
-                          value: _rememberMe,
-                          activeColor: AppColors.primary,
-                          checkColor: AppColors.white,
-                          side: const BorderSide(color: AppColors.border),
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
-                          onChanged: (value) {
-                            setState(() => _rememberMe = value ?? false);
-                          },
+                      TextButton(
+                        onPressed: _openRecover,
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppColors.secondary,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.xs,
+                          ),
+                          minimumSize: const Size(44, 44),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
-                      ),
-                      const SizedBox(width: AppSpacing.xs),
-                      Text(
-                        'Recordarme',
-                        style: AppTypography.body.copyWith(fontSize: 13),
+                        child: Text(
+                          '¿Olvidaste tu contraseña?',
+                          style: AppTypography.label.copyWith(
+                            color: AppColors.secondary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                       const Spacer(),
                       TextButton(

@@ -1,103 +1,112 @@
-import 'dart:convert';
-
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthRepository {
-  AuthRepository(this._prefs);
+  AuthRepository(this._client);
 
-  static const _usersKey = 'auth_users';
-  static const _sessionKey = 'auth_session';
-
-  final SharedPreferences _prefs;
-
-  static Future<AuthRepository> create() async {
-    final prefs = await SharedPreferences.getInstance();
-    return AuthRepository(prefs);
-  }
+  final SupabaseClient _client;
 
   String? currentSession() {
-    final session = _prefs.getString(_sessionKey);
-    if (session == null || session.isEmpty) {
+    return _client.auth.currentUser?.email;
+  }
+
+  Future<String?> register(String email, String password) async {
+    final validation = _validateEmailPassword(email, password);
+    if (validation != null) {
+      return validation;
+    }
+
+    try {
+      final response = await _client.auth.signUp(
+        email: email.trim(),
+        password: password,
+      );
+
+      if (response.session == null) {
+        return 'Revisa tu correo para confirmar la cuenta.';
+      }
       return null;
+    } on AuthException catch (error) {
+      return _mapAuthError(error, forRegister: true);
+    } catch (_) {
+      return 'No se pudo crear la cuenta. Intenta de nuevo.';
     }
-    return session;
   }
 
-  Future<String?> register(String username, String password) async {
-    final trimmed = username.trim();
-    if (trimmed.isEmpty) {
-      return 'Ingresa un usuario.';
-    }
-    if (password.isEmpty) {
-      return 'Ingresa una contraseña.';
-    }
-    if (_findExistingKey(trimmed) != null) {
-      return 'Ese usuario ya existe.';
+  Future<String?> login(String email, String password) async {
+    final validation = _validateEmailPassword(email, password);
+    if (validation != null) {
+      return validation;
     }
 
-    final users = _loadUsers();
-    users[trimmed] = password;
-    await _saveUsers(users);
-    return null;
+    try {
+      await _client.auth.signInWithPassword(
+        email: email.trim(),
+        password: password,
+      );
+      return null;
+    } on AuthException catch (error) {
+      return _mapAuthError(error, forRegister: false);
+    } catch (_) {
+      return 'No se pudo iniciar sesión. Intenta de nuevo.';
+    }
   }
 
-  Future<String?> login(
-    String username,
-    String password, {
-    required bool remember,
-  }) async {
-    final trimmed = username.trim();
+  Future<String?> sendPasswordReset(String email) async {
+    final trimmed = email.trim();
     if (trimmed.isEmpty) {
-      return 'Ingresa tu usuario.';
+      return 'Ingresa tu correo.';
+    }
+    if (!trimmed.contains('@')) {
+      return 'Ingresa un correo válido.';
+    }
+
+    try {
+      await _client.auth.resetPasswordForEmail(trimmed);
+      return null;
+    } on AuthException catch (error) {
+      return _mapAuthError(error, forRegister: false);
+    } catch (_) {
+      return 'No se pudo enviar el enlace. Intenta de nuevo.';
+    }
+  }
+
+  Future<void> logout() async {
+    await _client.auth.signOut();
+  }
+
+  String? _validateEmailPassword(String email, String password) {
+    final trimmed = email.trim();
+    if (trimmed.isEmpty) {
+      return 'Ingresa tu correo.';
+    }
+    if (!trimmed.contains('@')) {
+      return 'Ingresa un correo válido.';
     }
     if (password.isEmpty) {
       return 'Ingresa tu contraseña.';
     }
-
-    final key = _findExistingKey(trimmed);
-    if (key == null) {
-      return 'Usuario o contraseña incorrectos.';
-    }
-
-    final users = _loadUsers();
-    if (users[key] != password) {
-      return 'Usuario o contraseña incorrectos.';
-    }
-
-    if (remember) {
-      await _prefs.setString(_sessionKey, key);
-    } else {
-      await _prefs.remove(_sessionKey);
-    }
     return null;
   }
 
-  Future<void> logout() async {
-    await _prefs.remove(_sessionKey);
-  }
+  String _mapAuthError(AuthException error, {required bool forRegister}) {
+    final message = error.message.toLowerCase();
 
-  Map<String, String> _loadUsers() {
-    final raw = _prefs.getString(_usersKey);
-    if (raw == null || raw.isEmpty) {
-      return {};
+    if (forRegister &&
+        (message.contains('already registered') ||
+            message.contains('user already registered') ||
+            message.contains('already exists'))) {
+      return 'Ese correo ya está registrado.';
     }
-    final decoded = jsonDecode(raw) as Map<String, dynamic>;
-    return decoded.map(
-      (key, value) => MapEntry(key, value as String),
-    );
-  }
 
-  Future<void> _saveUsers(Map<String, String> users) async {
-    await _prefs.setString(_usersKey, jsonEncode(users));
-  }
-
-  String? _findExistingKey(String username) {
-    final lower = username.toLowerCase();
-    for (final key in _loadUsers().keys) {
-      if (key.toLowerCase() == lower) {
-        return key;
-      }
+    if (message.contains('invalid login credentials') ||
+        message.contains('invalid email or password')) {
+      return 'Correo o contraseña incorrectos.';
     }
-    return null;
+
+    if (message.contains('email not confirmed')) {
+      return 'Confirma tu correo antes de iniciar sesión.';
+    }
+
+    return error.message;
   }
 }

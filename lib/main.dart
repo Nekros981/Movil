@@ -10,6 +10,6 @@ Future<void> main() async {
     url: 'https://khaxjerxneoluzoktrdc.supabase.co',
     publishableKey: 'sb_publishable_ojJLV24jKUueycBNPiDeEg_45MsY4db',
   );
-  final authRepository = await AuthRepository.create();
+  final authRepository = AuthRepository(Supabase.instance.client);
   runApp(CampusQuestApp(authRepository: authRepository));
 }

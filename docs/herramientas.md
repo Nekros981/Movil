@@ -9,9 +9,8 @@ El sistema visual (colores, tipografía, pantallas) está en [diseño.md](diseñ
 | Herramienta | Versión | Para qué está | Estado |
 |---|---|---|---|
 | Flutter / Dart | SDK `^3.13.5` | App, pantallas y tema | En uso |
-| `supabase_flutter` | `^2.18.3` | Cliente del proyecto Supabase | Conectado al arrancar. El login aún no lo usa |
+| `supabase_flutter` | `^2.18.3` | Registro, login, sesión y recuperación de contraseña | En uso |
 | Supabase CLI | local, carpeta `supabase/` | Vincular este repo al proyecto remoto | Vinculado. No hace falta levantar Docker |
-| `shared_preferences` | `^2.5.6` | Usuarios y sesión en el teléfono | En uso. Se va a reemplazar |
 | `google_fonts` | `^9.0.0` | Manrope y DM Sans | En uso |
 | `audioplayers` | `^6.8.1` | Pistas musicales | Instalado. El reproductor aún no existe |
 | `cupertino_icons` | `^1.0.8` | Iconos iOS de la plantilla Flutter | En el `pubspec`. La UI usa iconos de Material |
@@ -32,7 +31,7 @@ flutter test
 
 ## Supabase
 
-Backend de cuentas: registro, inicio de sesión, recuperar contraseña, foto y nombre. La wiki y las pistas no van aquí; siguen en la app.
+Backend de cuentas: registro, inicio de sesión, recuperar contraseña, y más adelante foto y nombre en perfil. La wiki y las pistas no van aquí; siguen en la app.
 
 Hay dos piezas:
 
@@ -41,11 +40,7 @@ Hay dos piezas:
 
 `supabase start` levanta Postgres y Auth en tu máquina con Docker. Este proyecto no lo usa.
 
-Hoy `Supabase.initialize` corre al abrir la app, pero `lib/features/auth/auth_repository.dart` sigue guardando usuarios en el teléfono. El siguiente cambio es pasar ese repositorio a Supabase Auth.
-
-## shared_preferences
-
-Guarda datos simples en el dispositivo. Ahora mismo guarda el mapa de usuarios (`auth_users`) y, si el usuario marcó Recordarme, el nombre de la sesión (`auth_session`). Las contraseñas quedan en texto plano. Por eso este paquete sale cuando el acceso pase a Supabase.
+`lib/features/auth/auth_repository.dart` usa Supabase Auth: `signUp`, `signInWithPassword`, `resetPasswordForEmail` y `signOut`. La sesión la guarda el SDK en el dispositivo. El enlace de recuperación depende de la Site URL configurada en el dashboard.
 
 ## google_fonts
 
@@ -59,4 +54,4 @@ Va a reproducir las pistas desde archivos de la app (`assets/`), no desde Supaba
 
 `analysis_options.yaml` activa `flutter_lints`. `flutter analyze` debe quedar sin avisos antes de un commit.
 
-`test/widget_test.dart` abre la app sin pasar por `main.dart`, así que no inicializa Supabase. Usa `SharedPreferences` en memoria porque el login actual lee el almacenamiento al arrancar.
+`test/widget_test.dart` abre la app sin pasar por `main.dart`. En `setUpAll` inicializa Supabase con la misma URL y clave pública que `main.dart`. El SDK guarda la sesión con `shared_preferences` como dependencia transitiva; en pruebas se usa `SharedPreferences.setMockInitialValues({})`.
