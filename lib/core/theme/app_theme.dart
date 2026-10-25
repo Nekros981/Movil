@@ -30,6 +30,27 @@ abstract final class AppTheme {
         labelLarge: AppTypography.button,
         labelMedium: AppTypography.label,
       ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: AppColors.surface,
+        indicatorColor: AppColors.secondarySoft,
+        elevation: 0,
+        height: 72,
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          final active = states.contains(WidgetState.selected);
+          return AppTypography.label.copyWith(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: active ? AppColors.primary : AppColors.textSecondary,
+          );
+        }),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          final active = states.contains(WidgetState.selected);
+          return IconThemeData(
+            color: active ? AppColors.primary : AppColors.textSecondary,
+            size: 22,
+          );
+        }),
+      ),
     );
   }
 }

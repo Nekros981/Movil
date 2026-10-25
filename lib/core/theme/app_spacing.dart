@@ -17,8 +17,17 @@ abstract final class AppRadii {
   static const button = 14.0;
   static const card = 18.0;
   static const navCard = 19.0;
+  static const banner = 25.0;
+  static const bannerCut = 8.0;
   static const logo = 24.0;
   static const logoCut = 8.0;
+
+  static const bannerBorder = BorderRadius.only(
+    topLeft: Radius.circular(banner),
+    topRight: Radius.circular(banner),
+    bottomLeft: Radius.circular(banner),
+    bottomRight: Radius.circular(bannerCut),
+  );
 
   static const logoBorder = BorderRadius.only(
     topLeft: Radius.circular(logo),

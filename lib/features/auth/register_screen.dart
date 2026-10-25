@@ -5,7 +5,7 @@ import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/widgets/app_text_field.dart';
 import '../../core/widgets/primary_button.dart';
-import '../home/home_screen.dart';
+import '../shell/app_shell.dart';
 import 'auth_repository.dart';
 import 'widgets/auth_header.dart';
 
@@ -97,8 +97,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute<void>(
-        builder: (_) => HomeScreen(
-          username: sessionEmail,
+        builder: (_) => AppShell(
+          email: sessionEmail,
           authRepository: widget.authRepository,
         ),
       ),

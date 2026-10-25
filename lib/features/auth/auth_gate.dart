@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../home/home_screen.dart';
+import '../shell/app_shell.dart';
 import 'auth_repository.dart';
 import 'login_screen.dart';
 
@@ -33,8 +33,8 @@ class _AuthGateState extends State<AuthGate> {
     }
 
     if (_session != null) {
-      return HomeScreen(
-        username: _session!,
+      return AppShell(
+        email: _session!,
         authRepository: widget.authRepository,
       );
     }
