@@ -3,7 +3,24 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class AuthRepository {
   AuthRepository(this._client);
 
+  static final passwordPattern = RegExp(
+    r'^[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};:,.?/]+$',
+  );
+
+  static const passwordRulesMessage =
+      'Usa al menos 6 caracteres: letras, números o signos. Sin espacios ni emojis.';
+
   final SupabaseClient _client;
+
+  static String? validatePassword(String password) {
+    if (password.isEmpty) {
+      return 'Ingresa tu contraseña.';
+    }
+    if (password.length < 6 || !passwordPattern.hasMatch(password)) {
+      return passwordRulesMessage;
+    }
+    return null;
+  }
 
   String? currentSession() {
     return _client.auth.currentUser?.email;
@@ -82,10 +99,7 @@ class AuthRepository {
     if (!trimmed.contains('@')) {
       return 'Ingresa un correo válido.';
     }
-    if (password.isEmpty) {
-      return 'Ingresa tu contraseña.';
-    }
-    return null;
+    return validatePassword(password);
   }
 
   String _mapAuthError(AuthException error, {required bool forRegister}) {

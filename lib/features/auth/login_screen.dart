@@ -69,8 +69,9 @@ class _LoginScreenState extends State<LoginScreen> {
       _emailError = 'Ingresa un correo válido.';
       hasError = true;
     }
-    if (password.isEmpty) {
-      _passwordError = 'Ingresa tu contraseña.';
+    final passwordError = AuthRepository.validatePassword(password);
+    if (passwordError != null) {
+      _passwordError = passwordError;
       hasError = true;
     }
     if (hasError) {

@@ -57,8 +57,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _emailError = 'Ingresa un correo válido.';
       hasError = true;
     }
-    if (password.isEmpty) {
-      _passwordError = 'Ingresa una contraseña.';
+    final passwordError = AuthRepository.validatePassword(password);
+    if (passwordError != null) {
+      _passwordError = passwordError;
       hasError = true;
     }
     if (confirm.isEmpty) {
