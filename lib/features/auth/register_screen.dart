@@ -19,12 +19,14 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
 
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
+  String? _nameError;
   String? _emailError;
   String? _passwordError;
   String? _confirmError;
@@ -32,6 +34,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmController.dispose();
@@ -40,16 +43,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _submit() async {
     setState(() {
+      _nameError = null;
       _emailError = null;
       _passwordError = null;
       _confirmError = null;
     });
 
+    final name = _nameController.text;
     final email = _emailController.text;
     final password = _passwordController.text;
     final confirm = _confirmController.text;
 
     var hasError = false;
+    final nameError = AuthRepository.validateName(name);
+    if (nameError != null) {
+      _nameError = nameError;
+      hasError = true;
+    }
     if (email.trim().isEmpty) {
       _emailError = 'Ingresa tu correo.';
       hasError = true;
@@ -77,6 +87,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _submitting = true);
 
     final registerError = await widget.authRepository.register(
+      name,
       email,
       password,
     );
@@ -135,6 +146,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     style: AppTypography.body,
                   ),
                   const SizedBox(height: AppSpacing.xl),
+                  AppTextField(
+                    label: 'Nombre',
+                    hint: 'Miguel Angel Sandoval',
+                    icon: Icons.person_outline,
+                    controller: _nameController,
+                    errorText: _nameError,
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
                   AppTextField(
                     label: 'Correo',
                     hint: 'tu@correo.com',

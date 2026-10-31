@@ -10,7 +10,26 @@ class AuthRepository {
   static const passwordRulesMessage =
       'Usa al menos 6 caracteres: letras, números o signos. Sin espacios ni emojis.';
 
+  static final namePattern = RegExp(
+    r'^(?=.{5,}$)[A-Z][A-Za-z0-9]*(?: [A-Z][A-Za-z0-9]*)*$',
+  );
+
+  static const nameRulesMessage =
+      'Empieza con mayúscula, mínimo 5 caracteres, solo letras y números. '
+      'Cada palabra con mayúscula inicial, un espacio entre palabras.';
+
   final SupabaseClient _client;
+
+  static String? validateName(String name) {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) {
+      return 'Ingresa tu nombre.';
+    }
+    if (!namePattern.hasMatch(trimmed)) {
+      return nameRulesMessage;
+    }
+    return null;
+  }
 
   static String? validatePassword(String password) {
     if (password.isEmpty) {
@@ -26,7 +45,12 @@ class AuthRepository {
     return _client.auth.currentUser?.email;
   }
 
-  Future<String?> register(String email, String password) async {
+  Future<String?> register(String name, String email, String password) async {
+    final nameError = validateName(name);
+    if (nameError != null) {
+      return nameError;
+    }
+
     final validation = _validateEmailPassword(email, password);
     if (validation != null) {
       return validation;
@@ -36,6 +60,7 @@ class AuthRepository {
       final response = await _client.auth.signUp(
         email: email.trim(),
         password: password,
+        data: {'name': name.trim()},
       );
 
       if (response.session == null) {
