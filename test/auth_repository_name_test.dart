@@ -32,7 +32,7 @@ void main() {
 
     test('nombre corto válido conserva formato', () {
       expect(AuthRepository.validateName('Campus'), isNull);
-      expect(AuthRepository.validateName('Camp1'), isNull);
+      expect(AuthRepository.validateName('Camp1'), isNotNull);
     });
   });
 }

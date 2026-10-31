@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthRepository {
@@ -19,6 +21,8 @@ class AuthRepository {
       'Cada palabra con mayúscula inicial, un espacio entre palabras.';
 
   static const passwordResetRedirect = 'com.example.proycto1://reset-password/';
+
+  static const avatarBucket = 'avatars';
 
   final SupabaseClient _client;
 
@@ -45,6 +49,56 @@ class AuthRepository {
 
   String? currentSession() {
     return _client.auth.currentUser?.email;
+  }
+
+  String? currentName() {
+    final name = _client.auth.currentUser?.userMetadata?['name'];
+    if (name is String && name.trim().isNotEmpty) {
+      return name.trim();
+    }
+    return null;
+  }
+
+  String? currentAvatarUrl() {
+    final url = _client.auth.currentUser?.userMetadata?['avatar_url'];
+    if (url is String && url.trim().isNotEmpty) {
+      return url.trim();
+    }
+    return null;
+  }
+
+  Future<String?> uploadAvatar(Uint8List bytes) async {
+    final user = _client.auth.currentUser;
+    if (user == null) {
+      return 'Inicia sesión para subir tu foto.';
+    }
+
+    try {
+      final path = '${user.id}/avatar.jpg';
+      await _client.storage.from(avatarBucket).uploadBinary(
+        path,
+        bytes,
+        fileOptions: const FileOptions(
+          upsert: true,
+          contentType: 'image/jpeg',
+        ),
+      );
+
+      final publicUrl = _client.storage.from(avatarBucket).getPublicUrl(path);
+      final cacheBusted =
+          '$publicUrl?v=${DateTime.now().millisecondsSinceEpoch}';
+
+      await _client.auth.updateUser(
+        UserAttributes(data: {'avatar_url': cacheBusted}),
+      );
+      return null;
+    } on StorageException catch (error) {
+      return error.message;
+    } on AuthException catch (error) {
+      return _mapAuthError(error, forRegister: false);
+    } catch (_) {
+      return 'No se pudo subir la foto. Intenta de nuevo.';
+    }
   }
 
   Future<String?> register(String name, String email, String password) async {
