@@ -8,14 +8,14 @@ class AuthRepository {
   );
 
   static const passwordRulesMessage =
-      'Usa al menos 6 caracteres: letras, números o signos. Sin espacios ni emojis.';
+      'Usa al menos 6 caracteres: letras, números o signos.';
 
   static final namePattern = RegExp(
-    r'^(?=.{5,}$)[A-Z][A-Za-z0-9]*(?: [A-Z][A-Za-z0-9]*)*$',
+    r'^(?=.{5,}$)[A-Z][A-Za-z]*(?: [A-Z][A-Za-z]*)*$',
   );
 
   static const nameRulesMessage =
-      'Empieza con mayúscula, mínimo 5 caracteres, solo letras y números. '
+      'Empieza con mayúscula, mínimo 5 caracteres y solo letras. '
       'Cada palabra con mayúscula inicial, un espacio entre palabras.';
 
   static const passwordResetRedirect = 'com.example.proycto1://reset-password/';
