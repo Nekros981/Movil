@@ -18,6 +18,8 @@ class AuthRepository {
       'Empieza con mayúscula, mínimo 5 caracteres, solo letras y números. '
       'Cada palabra con mayúscula inicial, un espacio entre palabras.';
 
+  static const passwordResetRedirect = 'com.example.proycto1://reset-password/';
+
   final SupabaseClient _client;
 
   static String? validateName(String name) {
@@ -103,7 +105,10 @@ class AuthRepository {
     }
 
     try {
-      await _client.auth.resetPasswordForEmail(trimmed);
+      await _client.auth.resetPasswordForEmail(
+        trimmed,
+        redirectTo: passwordResetRedirect,
+      );
       return null;
     } on AuthException catch (error) {
       return _mapAuthError(error, forRegister: false);
@@ -111,6 +116,24 @@ class AuthRepository {
       return 'No se pudo enviar el enlace. Intenta de nuevo.';
     }
   }
+
+  Future<String?> updatePassword(String password) async {
+    final validation = validatePassword(password);
+    if (validation != null) {
+      return validation;
+    }
+
+    try {
+      await _client.auth.updateUser(UserAttributes(password: password));
+      return null;
+    } on AuthException catch (error) {
+      return _mapAuthError(error, forRegister: false);
+    } catch (_) {
+      return 'No se pudo actualizar la contraseña. Intenta de nuevo.';
+    }
+  }
+
+  Stream<AuthState> authStateChanges() => _client.auth.onAuthStateChange;
 
   Future<void> logout() async {
     await _client.auth.signOut();
