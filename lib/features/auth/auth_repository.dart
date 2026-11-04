@@ -101,6 +101,24 @@ class AuthRepository {
     }
   }
 
+  Future<String?> updateName(String name) async {
+    final nameError = validateName(name);
+    if (nameError != null) {
+      return nameError;
+    }
+
+    try {
+      await _client.auth.updateUser(
+        UserAttributes(data: {'name': name.trim()}),
+      );
+      return null;
+    } on AuthException catch (error) {
+      return _mapAuthError(error, forRegister: false);
+    } catch (_) {
+      return 'No se pudo actualizar el nombre. Intenta de nuevo.';
+    }
+  }
+
   Future<String?> register(String name, String email, String password) async {
     final nameError = validateName(name);
     if (nameError != null) {

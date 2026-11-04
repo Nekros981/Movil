@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
+import '../../core/widgets/app_text_field.dart';
 import '../../core/widgets/primary_button.dart';
 import '../auth/auth_repository.dart';
 import '../auth/login_screen.dart';
@@ -24,21 +25,59 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  late final TextEditingController _nameController;
+
   String? _name;
   String? _avatarUrl;
   bool _uploading = false;
+  bool _savingName = false;
   String? _avatarError;
+  String? _nameError;
 
   @override
   void initState() {
     super.initState();
+    _name = widget.authRepository.currentName();
+    _nameController = TextEditingController(text: _name ?? '');
     _loadProfile();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
   }
 
   void _loadProfile() {
     setState(() {
       _name = widget.authRepository.currentName();
       _avatarUrl = widget.authRepository.currentAvatarUrl();
+      _nameController.text = _name ?? '';
+    });
+  }
+
+  Future<void> _saveName() async {
+    if (_savingName) {
+      return;
+    }
+
+    setState(() => _nameError = null);
+
+    setState(() => _savingName = true);
+
+    final error = await widget.authRepository.updateName(_nameController.text);
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _savingName = false;
+      if (error != null) {
+        _nameError = error;
+      } else {
+        _name = widget.authRepository.currentName();
+      }
     });
   }
 
@@ -228,6 +267,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
             textAlign: TextAlign.center,
             style: AppTypography.body,
           ),
+        ),
+        const SizedBox(height: AppSpacing.xl),
+        Text('NOMBRE', style: AppTypography.overline),
+        const SizedBox(height: AppSpacing.xs),
+        AppTextField(
+          label: 'Tu nombre',
+          hint: 'Miguel Angel Sandoval',
+          icon: Icons.person_outline,
+          controller: _nameController,
+          errorText: _nameError,
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        PrimaryButton(
+          label: 'Guardar nombre  →',
+          onPressed: _savingName ? null : _saveName,
         ),
         const SizedBox(height: AppSpacing.xxl),
         PrimaryButton(

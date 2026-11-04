@@ -5,8 +5,8 @@ import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/widgets/app_text_field.dart';
 import '../../core/widgets/primary_button.dart';
-import '../shell/app_shell.dart';
 import 'auth_repository.dart';
+import 'loading_screen.dart';
 import 'recover_screen.dart';
 import 'register_screen.dart';
 import 'widgets/auth_header.dart';
@@ -100,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute<void>(
-        builder: (_) => AppShell(
+        builder: (_) => LoadingScreen(
           email: sessionEmail,
           authRepository: widget.authRepository,
         ),
