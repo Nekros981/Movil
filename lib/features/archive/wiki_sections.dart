@@ -24,17 +24,62 @@ class WikiSection {
   final String intro;
 }
 
+class WikiEntry {
+  const WikiEntry({
+    required this.title,
+    required this.imageAsset,
+  });
+
+  final String title;
+  final String imageAsset;
+}
+
+const wikiEntriesBySection = <String, List<WikiEntry>>{
+  'historia': [
+    WikiEntry(
+      title: 'Rectoría',
+      imageAsset: 'assets/img/historia/Rectoria.jpeg',
+    ),
+    WikiEntry(
+      title: 'SP',
+      imageAsset: 'assets/img/historia/SP.jpeg',
+    ),
+  ],
+  'storyboard': [
+    WikiEntry(
+      title: 'Rectoría',
+      imageAsset: 'assets/img/storyboard/Rectoria.jpeg',
+    ),
+    WikiEntry(
+      title: 'Acertijo 1',
+      imageAsset: 'assets/img/storyboard/Acertijo1.jpeg',
+    ),
+    WikiEntry(
+      title: 'Acertijo 2',
+      imageAsset: 'assets/img/storyboard/Acertijo2.jpeg',
+    ),
+    WikiEntry(
+      title: 'Acertijo 3',
+      imageAsset: 'assets/img/storyboard/Acertijo3.jpeg',
+    ),
+    WikiEntry(
+      title: 'Cierre Rectoría',
+      imageAsset: 'assets/img/storyboard/CierreRectoria.jpeg',
+    ),
+  ],
+};
+
 const wikiSections = <WikiSection>[
   WikiSection(
     id: 'historia',
-    overline: 'HISTORIA',
+    overline: 'EL ORIGEN DE LA AVENTURA',
     title: 'Historia',
     description: 'Origen del juego, lore y capítulos del universo.',
     color: AppColors.secondary,
     iconBackground: AppColors.secondarySoft,
     icon: Icons.menu_book_outlined,
     intro:
-        'Aquí irán los capítulos de la historia de Campus Quest. El contenido se cargará desde el archivo local de la wiki.',
+        'Un apagón inesperado ha despertado antiguos secretos bajo el campus. Ahora, una estudiante deberá reunir las piezas antes del gran festival universitario.',
   ),
   WikiSection(
     id: 'personajes',
@@ -49,13 +94,13 @@ const wikiSections = <WikiSection>[
   ),
   WikiSection(
     id: 'storyboard',
-    overline: 'STORYBOARD',
+    overline: 'DETRÁS DE CADA ESCENA',
     title: 'Storyboard',
     description: 'Escenas, paneles y secuencias del juego.',
     color: AppColors.storyboard,
     iconBackground: AppColors.accentSoft,
     icon: Icons.dashboard_outlined,
     intro:
-        'Aquí irán los paneles del storyboard. El contenido se cargará desde el archivo local de la wiki.',
+        'Sigue la aventura cuadro por cuadro y descubre cómo se construyen los momentos más importantes de Campus Quest.',
   ),
 ];

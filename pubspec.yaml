@@ -30,4 +30,7 @@ flutter:
 
   assets:
     - assets/img/logo.jpeg
+    - assets/img/historia/
+    - assets/img/storyboard/
+    - assets/audio/
 
