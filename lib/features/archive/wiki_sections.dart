@@ -25,10 +25,7 @@ class WikiSection {
 }
 
 class WikiEntry {
-  const WikiEntry({
-    required this.title,
-    required this.imageAsset,
-  });
+  const WikiEntry({required this.title, required this.imageAsset});
 
   final String title;
   final String imageAsset;
@@ -40,10 +37,7 @@ const wikiEntriesBySection = <String, List<WikiEntry>>{
       title: 'Rectoría',
       imageAsset: 'assets/img/historia/Rectoria.jpeg',
     ),
-    WikiEntry(
-      title: 'SP',
-      imageAsset: 'assets/img/historia/SP.jpeg',
-    ),
+    WikiEntry(title: 'SP', imageAsset: 'assets/img/historia/SP.jpeg'),
   ],
   'personajes': [
     WikiEntry(
@@ -84,8 +78,7 @@ const wikiSections = <WikiSection>[
     color: AppColors.secondary,
     iconBackground: AppColors.secondarySoft,
     icon: Icons.menu_book_outlined,
-    intro:
-        'Un apagón inesperado ha despertado antiguos secretos bajo el campus. Ahora, una estudiante deberá reunir las piezas antes del gran festival universitario.',
+    intro: 'Un apagón inesperado ha despertado antiguos secretos bajo el campus. Ahora, un estudiante deberá reunir los sellos para poder conseguir su titulo universitario.',
   ),
   WikiSection(
     id: 'personajes',
@@ -95,8 +88,7 @@ const wikiSections = <WikiSection>[
     color: AppColors.sage,
     iconBackground: AppColors.sageSoft,
     icon: Icons.groups_outlined,
-    intro:
-        'Conoce al equipo que hará de esta aventura algo inolvidable. Cada personaje tiene habilidades críticas para superar los desafíos del campus.',
+    intro: 'Conoce al equipo que hará de esta aventura algo inolvidable. Cada personaje tiene habilidades críticas para superar los desafíos del campus.',
   ),
   WikiSection(
     id: 'storyboard',
@@ -106,7 +98,6 @@ const wikiSections = <WikiSection>[
     color: AppColors.storyboard,
     iconBackground: AppColors.accentSoft,
     icon: Icons.dashboard_outlined,
-    intro:
-        'Sigue la aventura cuadro por cuadro y descubre cómo se construyen los momentos más importantes de Campus Quest.',
+    intro: 'Sigue la aventura cuadro por cuadro y descubre cómo se construyen los momentos más importantes de Campus Quest.',
   ),
 ];
