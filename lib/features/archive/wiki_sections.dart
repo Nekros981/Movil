@@ -45,6 +45,12 @@ const wikiEntriesBySection = <String, List<WikiEntry>>{
       imageAsset: 'assets/img/historia/SP.jpeg',
     ),
   ],
+  'personajes': [
+    WikiEntry(
+      title: 'Personaje principal',
+      imageAsset: 'assets/img/personajes/Principal.png',
+    ),
+  ],
   'storyboard': [
     WikiEntry(
       title: 'Rectoría',
@@ -83,14 +89,14 @@ const wikiSections = <WikiSection>[
   ),
   WikiSection(
     id: 'personajes',
-    overline: 'PERSONAJES',
+    overline: 'COMPAÑEROS DE MISIÓN',
     title: 'Personajes',
     description: 'Aliados, rivales y figuras del campus.',
     color: AppColors.sage,
     iconBackground: AppColors.sageSoft,
     icon: Icons.groups_outlined,
     intro:
-        'Aquí irán las fichas de personajes. El contenido se cargará desde el archivo local de la wiki.',
+        'Conoce al equipo que hará de esta aventura algo inolvidable. Cada personaje tiene habilidades críticas para superar los desafíos del campus.',
   ),
   WikiSection(
     id: 'storyboard',

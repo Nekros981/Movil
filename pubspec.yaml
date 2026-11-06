@@ -31,6 +31,7 @@ flutter:
   assets:
     - assets/img/logo.jpeg
     - assets/img/historia/
+    - assets/img/personajes/
     - assets/img/storyboard/
     - assets/audio/
 
