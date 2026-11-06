@@ -28,6 +28,13 @@ class _SectionScreenState extends State<SectionScreen> {
   WikiEntry? get _selectedEntry =>
       _entries.isEmpty ? null : _entries[_selectedIndex];
 
+  String get _bodyIntro {
+    if (_isInteractive && _selectedEntry != null) {
+      return _selectedEntry!.intro ?? widget.section.intro;
+    }
+    return widget.section.intro;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,7 +57,7 @@ class _SectionScreenState extends State<SectionScreen> {
           const SizedBox(height: AppSpacing.xs),
           Text(widget.section.title, style: AppTypography.sectionTitle),
           const SizedBox(height: AppSpacing.sm),
-          Text(widget.section.intro, style: AppTypography.body),
+          Text(_bodyIntro, style: AppTypography.body),
           const SizedBox(height: AppSpacing.xl),
           if (_isInteractive) ...[
             _HeroImage(assetPath: _selectedEntry!.imageAsset),

@@ -25,10 +25,17 @@ class WikiSection {
 }
 
 class WikiEntry {
-  const WikiEntry({required this.title, required this.imageAsset});
+  const WikiEntry({
+    required this.title,
+    required this.imageAsset,
+    this.intro,
+  });
 
   final String title;
   final String imageAsset;
+
+  /// Opcional. Si es null, la pantalla usa [WikiSection.intro].
+  final String? intro;
 }
 
 const wikiEntriesBySection = <String, List<WikiEntry>>{
@@ -37,7 +44,12 @@ const wikiEntriesBySection = <String, List<WikiEntry>>{
       title: 'Rectoría',
       imageAsset: 'assets/img/historia/Rectoria.jpeg',
     ),
-    WikiEntry(title: 'SP', imageAsset: 'assets/img/historia/SP.jpeg'),
+    WikiEntry(
+      title: 'SP',
+      imageAsset: 'assets/img/historia/SP.jpeg',
+      intro:
+          'La corrupcion a llegado a la base de seguridad publica y como nuevo estudiante es nuestro deber romper la corrupcion.',
+    ),
   ],
   'personajes': [
     WikiEntry(
