@@ -44,6 +44,12 @@ class _AuthGateState extends State<AuthGate> {
         _session = data.session?.user.email ?? widget.authRepository.currentSession();
         _loading = false;
       });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) {
+          return;
+        }
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      });
       return;
     }
 

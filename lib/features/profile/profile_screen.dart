@@ -26,13 +26,20 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late final TextEditingController _nameController;
+  final _passwordController = TextEditingController();
+  final _confirmController = TextEditingController();
 
   String? _name;
   String? _avatarUrl;
   bool _uploading = false;
   bool _savingName = false;
+  bool _savingPassword = false;
+  bool _obscurePassword = true;
+  bool _obscureConfirm = true;
   String? _avatarError;
   String? _nameError;
+  String? _passwordError;
+  String? _confirmError;
 
   @override
   void initState() {
@@ -45,6 +52,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void dispose() {
     _nameController.dispose();
+    _passwordController.dispose();
+    _confirmController.dispose();
     super.dispose();
   }
 
@@ -77,6 +86,56 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _nameError = error;
       } else {
         _name = widget.authRepository.currentName();
+      }
+    });
+  }
+
+  Future<void> _savePassword() async {
+    if (_savingPassword) {
+      return;
+    }
+
+    setState(() {
+      _passwordError = null;
+      _confirmError = null;
+    });
+
+    final password = _passwordController.text;
+    final confirm = _confirmController.text;
+
+    var hasError = false;
+    final passwordError = AuthRepository.validatePassword(password);
+    if (passwordError != null) {
+      _passwordError = passwordError;
+      hasError = true;
+    }
+    if (confirm.isEmpty) {
+      _confirmError = 'Confirma tu contraseña.';
+      hasError = true;
+    } else if (password != confirm) {
+      _confirmError = 'Las contraseñas no coinciden.';
+      hasError = true;
+    }
+    if (hasError) {
+      setState(() {});
+      return;
+    }
+
+    setState(() => _savingPassword = true);
+
+    final error = await widget.authRepository.updatePassword(password);
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _savingPassword = false;
+      if (error != null) {
+        _passwordError = error;
+      } else {
+        _passwordController.clear();
+        _confirmController.clear();
       }
     });
   }
@@ -282,6 +341,55 @@ class _ProfileScreenState extends State<ProfileScreen> {
         PrimaryButton(
           label: 'Guardar nombre  →',
           onPressed: _savingName ? null : _saveName,
+        ),
+        const SizedBox(height: AppSpacing.xxl),
+        Text('CONTRASEÑA', style: AppTypography.overline),
+        const SizedBox(height: AppSpacing.xs),
+        AppTextField(
+          label: 'Contraseña',
+          hint: 'Ingresa tu contraseña',
+          icon: Icons.lock_outline,
+          obscureText: _obscurePassword,
+          controller: _passwordController,
+          errorText: _passwordError,
+          suffix: IconButton(
+            onPressed: () {
+              setState(() => _obscurePassword = !_obscurePassword);
+            },
+            icon: Icon(
+              _obscurePassword
+                  ? Icons.visibility_outlined
+                  : Icons.visibility_off_outlined,
+              color: AppColors.textSecondary,
+              size: 20,
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        AppTextField(
+          label: 'Confirmar contraseña',
+          hint: 'Repite tu contraseña',
+          icon: Icons.lock_outline,
+          obscureText: _obscureConfirm,
+          controller: _confirmController,
+          errorText: _confirmError,
+          suffix: IconButton(
+            onPressed: () {
+              setState(() => _obscureConfirm = !_obscureConfirm);
+            },
+            icon: Icon(
+              _obscureConfirm
+                  ? Icons.visibility_outlined
+                  : Icons.visibility_off_outlined,
+              color: AppColors.textSecondary,
+              size: 20,
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        PrimaryButton(
+          label: 'Guardar contraseña  →',
+          onPressed: _savingPassword ? null : _savePassword,
         ),
         const SizedBox(height: AppSpacing.xxl),
         PrimaryButton(
