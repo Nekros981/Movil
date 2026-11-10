@@ -1,6 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
+import '../../core/l10n/app_language.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
@@ -77,6 +78,8 @@ class _TracksScreenState extends State<TracksScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppLanguageScope.stringsOf(context);
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.screen,
@@ -85,12 +88,12 @@ class _TracksScreenState extends State<TracksScreen> {
         AppSpacing.xl,
       ),
       children: [
-        Text('PISTAS', style: AppTypography.overline),
+        Text(strings.tracksOverline, style: AppTypography.overline),
         const SizedBox(height: AppSpacing.xs),
-        Text('Música del juego', style: AppTypography.sectionTitle),
+        Text(strings.gameMusic, style: AppTypography.sectionTitle),
         const SizedBox(height: AppSpacing.sm),
         Text(
-          'Reproduce las pistas oficiales de Campus Quest.',
+          strings.tracksDescription,
           style: AppTypography.body,
         ),
         const SizedBox(height: AppSpacing.lg),

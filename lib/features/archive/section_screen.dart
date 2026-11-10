@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../core/l10n/app_language.dart';
+import '../../core/l10n/app_strings.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
@@ -28,22 +30,28 @@ class _SectionScreenState extends State<SectionScreen> {
   WikiEntry? get _selectedEntry =>
       _entries.isEmpty ? null : _entries[_selectedIndex];
 
-  String get _bodyIntro {
+  String _bodyIntro(AppStrings strings) {
+    final sectionIntro = widget.section.localizedIntro(strings);
     if (_isInteractive && _selectedEntry != null) {
-      return _selectedEntry!.intro ?? widget.section.intro;
+      return _selectedEntry!.localizedIntro(strings, sectionIntro);
     }
-    return widget.section.intro;
+    return sectionIntro;
   }
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppLanguageScope.stringsOf(context);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
         foregroundColor: AppColors.textPrimary,
-        title: Text(widget.section.title, style: AppTypography.cardTitle),
+        title: Text(
+          widget.section.localizedTitle(strings),
+          style: AppTypography.cardTitle,
+        ),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(
@@ -53,11 +61,17 @@ class _SectionScreenState extends State<SectionScreen> {
           AppSpacing.xl,
         ),
         children: [
-          Text(widget.section.overline, style: AppTypography.overline),
+          Text(
+            widget.section.localizedOverline(strings),
+            style: AppTypography.overline,
+          ),
           const SizedBox(height: AppSpacing.xs),
-          Text(widget.section.title, style: AppTypography.sectionTitle),
+          Text(
+            widget.section.localizedTitle(strings),
+            style: AppTypography.sectionTitle,
+          ),
           const SizedBox(height: AppSpacing.sm),
-          Text(_bodyIntro, style: AppTypography.body),
+          Text(_bodyIntro(strings), style: AppTypography.body),
           const SizedBox(height: AppSpacing.xl),
           if (_isInteractive) ...[
             _HeroImage(assetPath: _selectedEntry!.imageAsset),
@@ -67,6 +81,7 @@ class _SectionScreenState extends State<SectionScreen> {
                 index: i,
                 entry: _entries[i],
                 section: widget.section,
+                strings: strings,
                 selected: i == _selectedIndex,
                 showThumbnail: _showThumbnails,
                 onTap: () => setState(() => _selectedIndex = i),
@@ -74,7 +89,7 @@ class _SectionScreenState extends State<SectionScreen> {
               if (i < _entries.length - 1) const SizedBox(height: AppSpacing.sm),
             ],
           ] else
-            _PlaceholderPanel(),
+            _PlaceholderPanel(message: strings.contentPreparing),
         ],
       ),
     );
@@ -95,8 +110,10 @@ class _HeroImage extends StatelessWidget {
         child: Image.asset(
           assetPath,
           fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) =>
-              const _PlaceholderPanel(compact: true),
+          errorBuilder: (context, error, stackTrace) => _PlaceholderPanel(
+            message: AppLanguageScope.stringsOf(context).contentPreparing,
+            compact: true,
+          ),
         ),
       ),
     );
@@ -108,6 +125,7 @@ class _EntryCard extends StatelessWidget {
     required this.index,
     required this.entry,
     required this.section,
+    required this.strings,
     required this.selected,
     required this.showThumbnail,
     required this.onTap,
@@ -116,6 +134,7 @@ class _EntryCard extends StatelessWidget {
   final int index;
   final WikiEntry entry;
   final WikiSection section;
+  final AppStrings strings;
   final bool selected;
   final bool showThumbnail;
   final VoidCallback onTap;
@@ -181,7 +200,7 @@ class _EntryCard extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.only(top: 2),
                   child: Text(
-                    entry.title,
+                    entry.localizedTitle(strings),
                     style: AppTypography.cardTitle.copyWith(
                       color: selected ? section.color : AppColors.textPrimary,
                     ),
@@ -197,8 +216,9 @@ class _EntryCard extends StatelessWidget {
 }
 
 class _PlaceholderPanel extends StatelessWidget {
-  const _PlaceholderPanel({this.compact = false});
+  const _PlaceholderPanel({required this.message, this.compact = false});
 
+  final String message;
   final bool compact;
 
   @override
@@ -215,7 +235,7 @@ class _PlaceholderPanel extends StatelessWidget {
         ),
       ),
       child: Text(
-        'Contenido en preparación',
+        message,
         textAlign: TextAlign.center,
         style: AppTypography.label.copyWith(color: AppColors.textSecondary),
       ),

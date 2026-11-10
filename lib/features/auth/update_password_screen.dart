@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/l10n/app_language.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
@@ -41,20 +42,21 @@ class _UpdatePasswordScreenState extends State<UpdatePasswordScreen> {
       _confirmError = null;
     });
 
+    final strings = AppLanguageScope.stringsOf(context);
     final password = _passwordController.text;
     final confirm = _confirmController.text;
 
     var hasError = false;
-    final passwordError = AuthRepository.validatePassword(password);
+    final passwordError = AuthRepository.validatePassword(password, strings);
     if (passwordError != null) {
       _passwordError = passwordError;
       hasError = true;
     }
     if (confirm.isEmpty) {
-      _confirmError = 'Confirma tu contraseña.';
+      _confirmError = strings.confirmPasswordPrompt;
       hasError = true;
     } else if (password != confirm) {
-      _confirmError = 'Las contraseñas no coinciden.';
+      _confirmError = strings.passwordsDoNotMatch;
       hasError = true;
     }
     if (hasError) {
@@ -82,7 +84,7 @@ class _UpdatePasswordScreenState extends State<UpdatePasswordScreen> {
     if (sessionEmail == null) {
       setState(() {
         _submitting = false;
-        _passwordError = 'No se pudo confirmar la sesión. Intenta de nuevo.';
+        _passwordError = strings.sessionConfirmFailed;
       });
       return;
     }
@@ -100,6 +102,8 @@ class _UpdatePasswordScreenState extends State<UpdatePasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppLanguageScope.stringsOf(context);
+
     return Scaffold(
       backgroundColor: AppColors.surface,
       body: Column(
@@ -117,18 +121,18 @@ class _UpdatePasswordScreenState extends State<UpdatePasswordScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('RECUPERACIÓN', style: AppTypography.overline),
+                  Text(strings.recoveryOverline, style: AppTypography.overline),
                   const SizedBox(height: AppSpacing.xs),
-                  Text('Nueva contraseña', style: AppTypography.loginTitle),
+                  Text(strings.newPasswordTitle, style: AppTypography.loginTitle),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
-                    'Elige una contraseña nueva para volver a entrar al archivo.',
+                    strings.updatePasswordSubtitle,
                     style: AppTypography.body,
                   ),
                   const SizedBox(height: AppSpacing.xl),
                   AppTextField(
-                    label: 'Contraseña',
-                    hint: 'Ingresa tu contraseña',
+                    label: strings.password,
+                    hint: strings.enterPassword,
                     icon: Icons.lock_outline,
                     obscureText: _obscurePassword,
                     controller: _passwordController,
@@ -148,8 +152,8 @@ class _UpdatePasswordScreenState extends State<UpdatePasswordScreen> {
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   AppTextField(
-                    label: 'Confirmar contraseña',
-                    hint: 'Repite tu contraseña',
+                    label: strings.confirmPassword,
+                    hint: strings.repeatPassword,
                     icon: Icons.lock_outline,
                     obscureText: _obscureConfirm,
                     controller: _confirmController,
@@ -169,7 +173,7 @@ class _UpdatePasswordScreenState extends State<UpdatePasswordScreen> {
                   ),
                   const SizedBox(height: AppSpacing.xl),
                   PrimaryButton(
-                    label: 'Guardar contraseña  →',
+                    label: strings.savePassword,
                     onPressed: _submitting ? null : _submit,
                   ),
                 ],

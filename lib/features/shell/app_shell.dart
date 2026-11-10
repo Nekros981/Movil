@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/l10n/app_language.dart';
 import '../../core/theme/app_colors.dart';
 import '../archive/archive_screen.dart';
 import '../auth/auth_repository.dart';
@@ -32,6 +33,8 @@ class _AppShellState extends State<AppShell> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppLanguageScope.stringsOf(context);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -39,8 +42,8 @@ class _AppShellState extends State<AppShell> {
           index: _index,
           children: [
             InicioScreen(onGoToArchive: () => _goToTab(1)),
-            const ArchiveScreen(),
-            const TracksScreen(),
+            ArchiveScreen(),
+            TracksScreen(),
             ProfileScreen(
               email: widget.email,
               authRepository: widget.authRepository,
@@ -51,26 +54,26 @@ class _AppShellState extends State<AppShell> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: _goToTab,
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Inicio',
+            icon: const Icon(Icons.home_outlined),
+            selectedIcon: const Icon(Icons.home),
+            label: strings.tabHome,
           ),
           NavigationDestination(
-            icon: Icon(Icons.folder_outlined),
-            selectedIcon: Icon(Icons.folder),
-            label: 'Archivo',
+            icon: const Icon(Icons.folder_outlined),
+            selectedIcon: const Icon(Icons.folder),
+            label: strings.tabArchive,
           ),
           NavigationDestination(
-            icon: Icon(Icons.music_note_outlined),
-            selectedIcon: Icon(Icons.music_note),
-            label: 'Pistas',
+            icon: const Icon(Icons.music_note_outlined),
+            selectedIcon: const Icon(Icons.music_note),
+            label: strings.tabTracks,
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Perfil',
+            icon: const Icon(Icons.person_outline),
+            selectedIcon: const Icon(Icons.person),
+            label: strings.tabProfile,
           ),
         ],
       ),

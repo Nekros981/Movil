@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../core/l10n/app_language.dart';
+import '../../core/l10n/app_strings.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
@@ -100,20 +102,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _confirmError = null;
     });
 
+    final strings = AppLanguageScope.stringsOf(context);
     final password = _passwordController.text;
     final confirm = _confirmController.text;
 
     var hasError = false;
-    final passwordError = AuthRepository.validatePassword(password);
+    final passwordError = AuthRepository.validatePassword(password, strings);
     if (passwordError != null) {
       _passwordError = passwordError;
       hasError = true;
     }
     if (confirm.isEmpty) {
-      _confirmError = 'Confirma tu contraseña.';
+      _confirmError = strings.confirmPasswordPrompt;
       hasError = true;
     } else if (password != confirm) {
-      _confirmError = 'Las contraseñas no coinciden.';
+      _confirmError = strings.passwordsDoNotMatch;
       hasError = true;
     }
     if (hasError) {
@@ -205,7 +208,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final displayName = _name ?? 'Sin nombre';
+    final strings = AppLanguageScope.stringsOf(context);
+    final language = AppLanguageScope.of(context);
+    final displayName = _name ?? strings.noName;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(
@@ -215,9 +220,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         AppSpacing.xl,
       ),
       children: [
-        Text('PERFIL', style: AppTypography.overline),
+        Text(strings.profileOverline, style: AppTypography.overline),
         const SizedBox(height: AppSpacing.xs),
-        Text('Tu cuenta', style: AppTypography.sectionTitle),
+        Text(strings.yourAccount, style: AppTypography.sectionTitle),
         const SizedBox(height: AppSpacing.xl),
         Center(
           child: Column(
@@ -295,7 +300,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
-                'Toca la foto para cambiarla',
+                strings.tapPhotoToChange,
                 style: AppTypography.body,
               ),
             ],
@@ -328,10 +333,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         const SizedBox(height: AppSpacing.xl),
-        Text('NOMBRE', style: AppTypography.overline),
+        Text(strings.languageOverline, style: AppTypography.overline),
+        const SizedBox(height: AppSpacing.xs),
+        DropdownButtonFormField<AppLocale>(
+          key: ValueKey(strings.locale),
+          initialValue: strings.locale,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: AppColors.surface,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: AppColors.textPrimary.withValues(alpha: 0.12),
+              ),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.sm,
+            ),
+          ),
+          items: [
+            DropdownMenuItem(
+              value: AppLocale.es,
+              child: Text(strings.languageSpanish),
+            ),
+            DropdownMenuItem(
+              value: AppLocale.en,
+              child: Text(strings.languageEnglish),
+            ),
+          ],
+          onChanged: (locale) {
+            if (locale == null) {
+              return;
+            }
+            language.setLocale(locale);
+          },
+        ),
+        const SizedBox(height: AppSpacing.xl),
+        Text(strings.nameOverline, style: AppTypography.overline),
         const SizedBox(height: AppSpacing.xs),
         AppTextField(
-          label: 'Tu nombre',
+          label: strings.yourName,
           hint: 'Miguel Angel Sandoval',
           icon: Icons.person_outline,
           controller: _nameController,
@@ -339,15 +381,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         const SizedBox(height: AppSpacing.lg),
         PrimaryButton(
-          label: 'Guardar nombre  →',
+          label: strings.saveName,
           onPressed: _savingName ? null : _saveName,
         ),
         const SizedBox(height: AppSpacing.xxl),
-        Text('CONTRASEÑA', style: AppTypography.overline),
+        Text(strings.passwordOverline, style: AppTypography.overline),
         const SizedBox(height: AppSpacing.xs),
         AppTextField(
-          label: 'Contraseña',
-          hint: 'Ingresa tu contraseña',
+          label: strings.password,
+          hint: strings.enterPassword,
           icon: Icons.lock_outline,
           obscureText: _obscurePassword,
           controller: _passwordController,
@@ -367,8 +409,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         const SizedBox(height: AppSpacing.lg),
         AppTextField(
-          label: 'Confirmar contraseña',
-          hint: 'Repite tu contraseña',
+          label: strings.confirmPassword,
+          hint: strings.repeatPassword,
           icon: Icons.lock_outline,
           obscureText: _obscureConfirm,
           controller: _confirmController,
@@ -388,12 +430,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         const SizedBox(height: AppSpacing.lg),
         PrimaryButton(
-          label: 'Guardar contraseña  →',
+          label: strings.savePassword,
           onPressed: _savingPassword ? null : _savePassword,
         ),
         const SizedBox(height: AppSpacing.xxl),
         PrimaryButton(
-          label: 'Cerrar sesión',
+          label: strings.logout,
           onPressed: () => _logout(context),
         ),
       ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/l10n/app_language.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/widgets/section_card.dart';
@@ -11,6 +12,8 @@ class ArchiveScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppLanguageScope.stringsOf(context);
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.screen,
@@ -19,20 +22,20 @@ class ArchiveScreen extends StatelessWidget {
         AppSpacing.xl,
       ),
       children: [
-        Text('ARCHIVO', style: AppTypography.overline),
+        Text(strings.archiveOverline, style: AppTypography.overline),
         const SizedBox(height: AppSpacing.xs),
-        Text('Wiki del juego', style: AppTypography.sectionTitle),
+        Text(strings.gameWiki, style: AppTypography.sectionTitle),
         const SizedBox(height: AppSpacing.sm),
         Text(
-          'Elige una sección para leer su contenido.',
+          strings.pickWikiSection,
           style: AppTypography.body,
         ),
         const SizedBox(height: AppSpacing.lg),
         for (var i = 0; i < wikiSections.length; i++) ...[
           SectionCard(
             indexLabel: '0${i + 1}',
-            title: wikiSections[i].title,
-            description: wikiSections[i].description,
+            title: wikiSections[i].localizedTitle(strings),
+            description: wikiSections[i].localizedDescription(strings),
             icon: wikiSections[i].icon,
             iconColor: wikiSections[i].color,
             iconBackground: wikiSections[i].iconBackground,

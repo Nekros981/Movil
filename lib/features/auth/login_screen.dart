@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/l10n/app_language.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
@@ -58,18 +59,19 @@ class _LoginScreenState extends State<LoginScreen> {
       _passwordError = null;
     });
 
+    final strings = AppLanguageScope.stringsOf(context);
     final email = _emailController.text;
     final password = _passwordController.text;
 
     var hasError = false;
     if (email.trim().isEmpty) {
-      _emailError = 'Ingresa tu correo.';
+      _emailError = strings.enterEmail;
       hasError = true;
     } else if (!email.trim().contains('@')) {
-      _emailError = 'Ingresa un correo válido.';
+      _emailError = strings.enterValidEmail;
       hasError = true;
     }
-    final passwordError = AuthRepository.validatePassword(password);
+    final passwordError = AuthRepository.validatePassword(password, strings);
     if (passwordError != null) {
       _passwordError = passwordError;
       hasError = true;
@@ -111,6 +113,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppLanguageScope.stringsOf(context);
+
     return Scaffold(
       backgroundColor: AppColors.surface,
       body: Column(
@@ -128,17 +132,17 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('BIENVENIDO DE VUELTA', style: AppTypography.overline),
+                  Text(strings.welcomeBack, style: AppTypography.overline),
                   const SizedBox(height: AppSpacing.xs),
-                  Text('Continúa tu aventura', style: AppTypography.loginTitle),
+                  Text(strings.continueAdventure, style: AppTypography.loginTitle),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
-                    'Ingresa con tu cuenta para explorar el universo de Campus Quest.',
+                    strings.loginSubtitle,
                     style: AppTypography.body,
                   ),
                   const SizedBox(height: AppSpacing.xl),
                   AppTextField(
-                    label: 'Correo',
+                    label: strings.email,
                     hint: 'tu@correo.com',
                     icon: Icons.email_outlined,
                     controller: _emailController,
@@ -146,8 +150,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   AppTextField(
-                    label: 'Contraseña',
-                    hint: 'Ingresa tu contraseña',
+                    label: strings.password,
+                    hint: strings.enterPassword,
                     icon: Icons.lock_outline,
                     obscureText: _obscurePassword,
                     controller: _passwordController,
@@ -179,7 +183,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
                         child: Text(
-                          '¿Olvidaste tu contraseña?',
+                          strings.forgotPassword,
                           style: AppTypography.label.copyWith(
                             color: AppColors.secondary,
                             fontWeight: FontWeight.w600,
@@ -198,7 +202,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
                         child: Text(
-                          'Crear cuenta',
+                          strings.createAccountLink,
                           style: AppTypography.label.copyWith(
                             color: AppColors.secondary,
                             fontWeight: FontWeight.w600,
@@ -209,7 +213,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: AppSpacing.xl),
                   PrimaryButton(
-                    label: 'Iniciar sesión  →',
+                    label: strings.signIn,
                     onPressed: _submitting ? null : _submit,
                   ),
                 ],

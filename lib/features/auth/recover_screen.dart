@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/l10n/app_language.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
@@ -36,13 +37,14 @@ class _RecoverScreenState extends State<RecoverScreen> {
       _sent = false;
     });
 
+    final strings = AppLanguageScope.stringsOf(context);
     final email = _emailController.text;
     if (email.trim().isEmpty) {
-      setState(() => _emailError = 'Ingresa tu correo.');
+      setState(() => _emailError = strings.enterEmail);
       return;
     }
     if (!email.trim().contains('@')) {
-      setState(() => _emailError = 'Ingresa un correo válido.');
+      setState(() => _emailError = strings.enterValidEmail);
       return;
     }
 
@@ -66,6 +68,8 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppLanguageScope.stringsOf(context);
+
     return Scaffold(
       backgroundColor: AppColors.surface,
       body: Column(
@@ -83,17 +87,17 @@ class _RecoverScreenState extends State<RecoverScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('RECUPERACIÓN', style: AppTypography.overline),
+                  Text(strings.recoveryOverline, style: AppTypography.overline),
                   const SizedBox(height: AppSpacing.xs),
-                  Text('Recupera tu acceso', style: AppTypography.loginTitle),
+                  Text(strings.recoverAccess, style: AppTypography.loginTitle),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
-                    'Te enviaremos un enlace a tu correo para elegir una contraseña nueva.',
+                    strings.recoverSubtitle,
                     style: AppTypography.body,
                   ),
                   const SizedBox(height: AppSpacing.xl),
                   AppTextField(
-                    label: 'Correo',
+                    label: strings.email,
                     hint: 'tu@correo.com',
                     icon: Icons.email_outlined,
                     controller: _emailController,
@@ -102,7 +106,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                   if (_sent) ...[
                     const SizedBox(height: AppSpacing.md),
                     Text(
-                      'Si el correo está registrado, enviamos un enlace para elegir una contraseña nueva.',
+                      strings.recoverEmailSent,
                       style: AppTypography.body.copyWith(
                         color: AppColors.secondary,
                       ),
@@ -122,7 +126,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                       child: Text(
-                        'Iniciar sesión',
+                        strings.signInLink,
                         style: AppTypography.label.copyWith(
                           color: AppColors.secondary,
                           fontWeight: FontWeight.w600,
@@ -132,7 +136,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                   ),
                   const SizedBox(height: AppSpacing.xl),
                   PrimaryButton(
-                    label: 'Enviar enlace  →',
+                    label: strings.sendResetLink,
                     onPressed: _submitting ? null : _submit,
                   ),
                 ],

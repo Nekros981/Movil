@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:proycto_1/app.dart';
+import 'package:proycto_1/core/l10n/app_language.dart';
 import 'package:proycto_1/features/auth/auth_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -17,9 +18,16 @@ void main() {
   });
 
   testWidgets('Login muestra título y acciones de sesión', (tester) async {
-    final authRepository = AuthRepository(Supabase.instance.client);
+    final appLanguage = AppLanguage();
+    final authRepository =
+        AuthRepository(Supabase.instance.client, appLanguage);
 
-    await tester.pumpWidget(CampusQuestApp(authRepository: authRepository));
+    await tester.pumpWidget(
+      CampusQuestApp(
+        authRepository: authRepository,
+        appLanguage: appLanguage,
+      ),
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('Continúa tu aventura'), findsOneWidget);

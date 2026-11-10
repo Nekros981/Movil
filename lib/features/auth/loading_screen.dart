@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../core/l10n/app_language.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../shell/app_shell.dart';
@@ -47,6 +48,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppLanguageScope.stringsOf(context);
+
     return Scaffold(
       backgroundColor: AppColors.primary,
       body: SafeArea(
@@ -78,7 +81,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  'Preparando tu archivo…',
+                  strings.preparingArchive,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.dmSans(
                     fontSize: 14,

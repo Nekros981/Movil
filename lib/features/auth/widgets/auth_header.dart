@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_language.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 
@@ -8,6 +9,7 @@ class AuthHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppLanguageScope.stringsOf(context);
     final top = MediaQuery.paddingOf(context).top;
 
     return ColoredBox(
@@ -25,10 +27,10 @@ class AuthHeader extends StatelessWidget {
             Row(
               children: [
                 Expanded(child: _headerLine()),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
                   child: Text(
-                    'ARCHIVO OFICIAL DEL VIDEOJUEGO',
+                    strings.authOfficialGameArchive,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Color(0xA6FFFFFF),

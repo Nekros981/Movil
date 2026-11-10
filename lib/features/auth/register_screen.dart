@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/l10n/app_language.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
@@ -49,34 +50,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _confirmError = null;
     });
 
+    final strings = AppLanguageScope.stringsOf(context);
     final name = _nameController.text;
     final email = _emailController.text;
     final password = _passwordController.text;
     final confirm = _confirmController.text;
 
     var hasError = false;
-    final nameError = AuthRepository.validateName(name);
+    final nameError = AuthRepository.validateName(name, strings);
     if (nameError != null) {
       _nameError = nameError;
       hasError = true;
     }
     if (email.trim().isEmpty) {
-      _emailError = 'Ingresa tu correo.';
+      _emailError = strings.enterEmail;
       hasError = true;
     } else if (!email.trim().contains('@')) {
-      _emailError = 'Ingresa un correo válido.';
+      _emailError = strings.enterValidEmail;
       hasError = true;
     }
-    final passwordError = AuthRepository.validatePassword(password);
+    final passwordError = AuthRepository.validatePassword(password, strings);
     if (passwordError != null) {
       _passwordError = passwordError;
       hasError = true;
     }
     if (confirm.isEmpty) {
-      _confirmError = 'Confirma tu contraseña.';
+      _confirmError = strings.confirmPasswordPrompt;
       hasError = true;
     } else if (password != confirm) {
-      _confirmError = 'Las contraseñas no coinciden.';
+      _confirmError = strings.passwordsDoNotMatch;
       hasError = true;
     }
     if (hasError) {
@@ -120,6 +122,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppLanguageScope.stringsOf(context);
+
     return Scaffold(
       backgroundColor: AppColors.surface,
       body: Column(
@@ -137,17 +141,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('NUEVA PARTIDA', style: AppTypography.overline),
+                  Text(strings.newGame, style: AppTypography.overline),
                   const SizedBox(height: AppSpacing.xs),
-                  Text('Crea tu cuenta', style: AppTypography.loginTitle),
+                  Text(strings.createAccountTitle, style: AppTypography.loginTitle),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
-                    'Elige un correo y una contraseña para entrar al archivo.',
+                    strings.registerSubtitle,
                     style: AppTypography.body,
                   ),
                   const SizedBox(height: AppSpacing.xl),
                   AppTextField(
-                    label: 'Nombre',
+                    label: strings.name,
                     hint: 'Miguel Angel Sandoval',
                     icon: Icons.person_outline,
                     controller: _nameController,
@@ -155,7 +159,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   AppTextField(
-                    label: 'Correo',
+                    label: strings.email,
                     hint: 'tu@correo.com',
                     icon: Icons.email_outlined,
                     controller: _emailController,
@@ -163,8 +167,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   AppTextField(
-                    label: 'Contraseña',
-                    hint: 'Ingresa tu contraseña',
+                    label: strings.password,
+                    hint: strings.enterPassword,
                     icon: Icons.lock_outline,
                     obscureText: _obscurePassword,
                     controller: _passwordController,
@@ -184,8 +188,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   AppTextField(
-                    label: 'Confirmar contraseña',
-                    hint: 'Repite tu contraseña',
+                    label: strings.confirmPassword,
+                    hint: strings.repeatPassword,
                     icon: Icons.lock_outline,
                     obscureText: _obscureConfirm,
                     controller: _confirmController,
@@ -217,7 +221,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                       child: Text(
-                        'Iniciar sesión',
+                        strings.signInLink,
                         style: AppTypography.label.copyWith(
                           color: AppColors.secondary,
                           fontWeight: FontWeight.w600,
@@ -227,7 +231,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: AppSpacing.xl),
                   PrimaryButton(
-                    label: 'Crear cuenta  →',
+                    label: strings.createAccountButton,
                     onPressed: _submitting ? null : _submit,
                   ),
                 ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/l10n/app_language.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/widgets/app_banner.dart';
@@ -13,6 +14,8 @@ class InicioScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppLanguageScope.stringsOf(context);
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.screen,
@@ -21,22 +24,21 @@ class InicioScreen extends StatelessWidget {
         AppSpacing.xl,
       ),
       children: [
-        const AppBanner(
-          label: 'ARCHIVO OFICIAL',
+        AppBanner(
+          label: strings.officialArchiveLabel,
           title: 'Campus Quest',
-          description:
-              'Explora el universo del videojuego: historia, personajes y storyboard.',
+          description: strings.homeBannerDescription,
         ),
         const SizedBox(height: AppSpacing.xxl),
-        Text('EXPLORACIÓN', style: AppTypography.overline),
+        Text(strings.exploration, style: AppTypography.overline),
         const SizedBox(height: AppSpacing.xs),
-        Text('¿Qué quieres explorar?', style: AppTypography.sectionTitle),
+        Text(strings.whatToExplore, style: AppTypography.sectionTitle),
         const SizedBox(height: AppSpacing.lg),
         for (var i = 0; i < wikiSections.length; i++) ...[
           SectionCard(
             indexLabel: '0${i + 1}',
-            title: wikiSections[i].title,
-            description: wikiSections[i].description,
+            title: wikiSections[i].localizedTitle(strings),
+            description: wikiSections[i].localizedDescription(strings),
             icon: wikiSections[i].icon,
             iconColor: wikiSections[i].color,
             iconBackground: wikiSections[i].iconBackground,

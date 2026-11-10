@@ -2,50 +2,54 @@ import 'dart:typed_data';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../core/l10n/app_language.dart';
+import '../../core/l10n/app_strings.dart';
+
 class AuthRepository {
-  AuthRepository(this._client);
+  AuthRepository(this._client, this._language);
 
   static final passwordPattern = RegExp(
     r'^[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};:,.?/]+$',
   );
 
-  static const passwordRulesMessage =
-      'Usa al menos 6 caracteres: letras, números o signos.';
-
   static final namePattern = RegExp(
     r'^(?=.{5,}$)[A-Z][A-Za-z]*(?: [A-Z][A-Za-z]*)*$',
   );
-
-  static const nameRulesMessage =
-      'Empieza con mayúscula, mínimo 5 caracteres y solo letras. '
-      'Cada palabra con mayúscula inicial, un espacio entre palabras.';
 
   static const passwordResetRedirect = 'com.example.proycto1://reset-password/';
 
   static const avatarBucket = 'avatars';
 
   final SupabaseClient _client;
+  final AppLanguage _language;
 
-  static String? validateName(String name) {
+  AppStrings get _s => _language.strings;
+
+  static String? validateName(String name, AppStrings strings) {
     final trimmed = name.trim();
     if (trimmed.isEmpty) {
-      return 'Ingresa tu nombre.';
+      return strings.enterName;
     }
     if (!namePattern.hasMatch(trimmed)) {
-      return nameRulesMessage;
+      return strings.nameRules;
     }
     return null;
   }
 
-  static String? validatePassword(String password) {
+  static String? validatePassword(String password, AppStrings strings) {
     if (password.isEmpty) {
-      return 'Ingresa tu contraseña.';
+      return strings.enterPasswordPrompt;
     }
     if (password.length < 6 || !passwordPattern.hasMatch(password)) {
-      return passwordRulesMessage;
+      return strings.passwordRules;
     }
     return null;
   }
+
+  String? validateNameForLocale(String name) => validateName(name, _s);
+
+  String? validatePasswordForLocale(String password) =>
+      validatePassword(password, _s);
 
   String? currentSession() {
     return _client.auth.currentUser?.email;
@@ -70,7 +74,7 @@ class AuthRepository {
   Future<String?> uploadAvatar(Uint8List bytes) async {
     final user = _client.auth.currentUser;
     if (user == null) {
-      return 'Inicia sesión para subir tu foto.';
+      return _s.signInToUploadPhoto;
     }
 
     try {
@@ -97,12 +101,12 @@ class AuthRepository {
     } on AuthException catch (error) {
       return _mapAuthError(error, forRegister: false);
     } catch (_) {
-      return 'No se pudo subir la foto. Intenta de nuevo.';
+      return _s.uploadPhotoFailed;
     }
   }
 
   Future<String?> updateName(String name) async {
-    final nameError = validateName(name);
+    final nameError = validateName(name, _s);
     if (nameError != null) {
       return nameError;
     }
@@ -115,12 +119,12 @@ class AuthRepository {
     } on AuthException catch (error) {
       return _mapAuthError(error, forRegister: false);
     } catch (_) {
-      return 'No se pudo actualizar el nombre. Intenta de nuevo.';
+      return _s.updateNameFailed;
     }
   }
 
   Future<String?> register(String name, String email, String password) async {
-    final nameError = validateName(name);
+    final nameError = validateName(name, _s);
     if (nameError != null) {
       return nameError;
     }
@@ -138,13 +142,13 @@ class AuthRepository {
       );
 
       if (response.session == null) {
-        return 'Revisa tu correo para confirmar la cuenta.';
+        return _s.checkEmailConfirm;
       }
       return null;
     } on AuthException catch (error) {
       return _mapAuthError(error, forRegister: true);
     } catch (_) {
-      return 'No se pudo crear la cuenta. Intenta de nuevo.';
+      return _s.registerFailed;
     }
   }
 
@@ -163,17 +167,17 @@ class AuthRepository {
     } on AuthException catch (error) {
       return _mapAuthError(error, forRegister: false);
     } catch (_) {
-      return 'No se pudo iniciar sesión. Intenta de nuevo.';
+      return _s.loginFailed;
     }
   }
 
   Future<String?> sendPasswordReset(String email) async {
     final trimmed = email.trim();
     if (trimmed.isEmpty) {
-      return 'Ingresa tu correo.';
+      return _s.enterEmail;
     }
     if (!trimmed.contains('@')) {
-      return 'Ingresa un correo válido.';
+      return _s.enterValidEmail;
     }
 
     try {
@@ -185,12 +189,12 @@ class AuthRepository {
     } on AuthException catch (error) {
       return _mapAuthError(error, forRegister: false);
     } catch (_) {
-      return 'No se pudo enviar el enlace. Intenta de nuevo.';
+      return _s.sendLinkFailed;
     }
   }
 
   Future<String?> updatePassword(String password) async {
-    final validation = validatePassword(password);
+    final validation = validatePassword(password, _s);
     if (validation != null) {
       return validation;
     }
@@ -201,7 +205,7 @@ class AuthRepository {
     } on AuthException catch (error) {
       return _mapAuthError(error, forRegister: false);
     } catch (_) {
-      return 'No se pudo actualizar la contraseña. Intenta de nuevo.';
+      return _s.updatePasswordFailed;
     }
   }
 
@@ -214,12 +218,12 @@ class AuthRepository {
   String? _validateEmailPassword(String email, String password) {
     final trimmed = email.trim();
     if (trimmed.isEmpty) {
-      return 'Ingresa tu correo.';
+      return _s.enterEmail;
     }
     if (!trimmed.contains('@')) {
-      return 'Ingresa un correo válido.';
+      return _s.enterValidEmail;
     }
-    return validatePassword(password);
+    return validatePassword(password, _s);
   }
 
   String _mapAuthError(AuthException error, {required bool forRegister}) {
@@ -229,16 +233,16 @@ class AuthRepository {
         (message.contains('already registered') ||
             message.contains('user already registered') ||
             message.contains('already exists'))) {
-      return 'Ese correo ya está registrado.';
+      return _s.emailAlreadyRegistered;
     }
 
     if (message.contains('invalid login credentials') ||
         message.contains('invalid email or password')) {
-      return 'Correo o contraseña incorrectos.';
+      return _s.invalidCredentials;
     }
 
     if (message.contains('email not confirmed')) {
-      return 'Confirma tu correo antes de iniciar sesión.';
+      return _s.confirmEmailBeforeLogin;
     }
 
     return error.message;
